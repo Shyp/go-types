@@ -65,5 +65,9 @@ func (pu *PrefixUUID) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (pu PrefixUUID) Value() (driver.Value, error) {
-	return pu.UUID[:], nil
+	// In theory we should be able to send 16 raw bytes to the database
+	// and have it encoded as a UUID. However, this requires enabling
+	// binary_parameters=yes on the connection string. Instead of that, just
+	// pass a string to the database.
+	return pu.UUID.String(), nil
 }
