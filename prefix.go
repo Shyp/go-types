@@ -55,7 +55,13 @@ func (pu *PrefixUUID) Scan(value interface{}) error {
 	if !ok {
 		return fmt.Errorf("types: can't scan value %v into a PrefixUUID", value)
 	}
-	u, err := uuid.Parse(bits)
+	var u *uuid.UUID
+	var err error
+	if len(bits) == 36 {
+		u, err = uuid.ParseHex(string(bits))
+	} else {
+		u, err = uuid.Parse(bits)
+	}
 	if err != nil {
 		return err
 	}
