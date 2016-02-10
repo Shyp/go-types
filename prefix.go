@@ -1,6 +1,7 @@
 package types
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -41,4 +42,28 @@ func (pu PrefixUUID) MarshalJSON() ([]byte, error) {
 		return []byte{}, errors.New("no UUID to convert to JSON")
 	}
 	return json.Marshal(pu.String())
+}
+
+// Scan implements the Scanner interface. Note only the UUID gets scanned/set
+// here, we can't determine the prefix from the database. `value` should be
+// a [16]byte
+func (pu *PrefixUUID) Scan(value interface{}) error {
+	if value == nil {
+		return errors.New("types: cannot scan null into a PrefixUUID")
+	}
+	bits, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("types: can't scan value %v into a PrefixUUID", value)
+	}
+	u, err := uuid.Parse(bits)
+	if err != nil {
+		return err
+	}
+	pu.UUID = u
+	return nil
+}
+
+// Value implements the driver.Valuer interface.
+func (pu PrefixUUID) Value() (driver.Value, error) {
+	return pu.UUID[:], nil
 }
