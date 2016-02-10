@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 )
 
-// A NullString is a String that may be null. It can be encoded or decoded from
-// JSON or the database.
+const version = "0.2"
+
 type NullString struct {
 	sql.NullString
-	Valid  bool
-	String string
+	Valid	bool
+	String	string
 }
 
 func (ns *NullString) UnmarshalJSON(b []byte) error {
@@ -40,7 +40,6 @@ func (ns NullString) MarshalJSON() ([]byte, error) {
 	return s, nil
 }
 
-// Scan implements the Scanner interface.
 func (ns *NullString) Scan(value interface{}) error {
 	if value == nil {
 		ns.String, ns.Valid = "", false
@@ -50,7 +49,6 @@ func (ns *NullString) Scan(value interface{}) error {
 	return nil
 }
 
-// Value implements the driver.Valuer interface.
 func (ns NullString) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
