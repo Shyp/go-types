@@ -22,7 +22,7 @@ func (u *PrefixUUID) String() string {
 // an error if uuidstr cannot be parsed as a valid UUID
 func NewPrefixUUID(caboodle string) (*PrefixUUID, error) {
 	if len(caboodle) < 36 {
-		return nil, fmt.Errorf("types: could not read \"%s\" as a UUID", caboodle)
+		return nil, fmt.Errorf("types: Could not parse \"%s\" as a UUID with a prefix", caboodle)
 	}
 	uuidPart := caboodle[len(caboodle)-36:]
 	u, err := uuid.ParseHex(uuidPart)

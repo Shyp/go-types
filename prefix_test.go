@@ -34,8 +34,8 @@ var unmarshalTests = []struct {
 }{
 	{"usr_6740b44e-13b9-475d-af06-979627e0e0d6", "usr_", "6740b44e-13b9-475d-af06-979627e0e0d6", nil},
 	{"6740b44e-13b9-475d-af06-979627e0e0d6", "", "6740b44e-13b9-475d-af06-979627e0e0d6", nil},
-	{"", "", "", errors.New("types: could not read \"\" as a UUID")},
-	{"foo", "", "", errors.New("types: could not read \"foo\" as a UUID")},
+	{"", "", "", errors.New("types: Could not parse \"\" as a UUID with a prefix")},
+	{"foo", "", "", errors.New("types: Could not parse \"foo\" as a UUID with a prefix")},
 	{"6740b44e-13b9-475d-af069-79627e0e0d6", "", "", errors.New("Invalid UUID string")},
 }
 
