@@ -20,11 +20,10 @@ func TestUUIDString(t *testing.T) {
 }
 
 func TestNewUUIDPrefix(t *testing.T) {
-	u, _ := uuid.NewV4()
-	pfx, err := NewPrefixUUID("job_", u.String())
+	pfx, err := NewPrefixUUID("usr_6740b44e-13b9-475d-af06-979627e0e0d6")
 	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, pfx.Prefix, "job_")
-	test.AssertEquals(t, pfx.UUID.String(), u.String())
+	test.AssertEquals(t, pfx.Prefix, "usr_")
+	test.AssertEquals(t, pfx.UUID.String(), "6740b44e-13b9-475d-af06-979627e0e0d6")
 }
 
 var unmarshalTests = []struct {

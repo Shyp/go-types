@@ -20,13 +20,18 @@ func (u *PrefixUUID) String() string {
 
 // NewPrefixUUID creates a PrefixUUID from the prefix and string uuid. Returns
 // an error if uuidstr cannot be parsed as a valid UUID
-func NewPrefixUUID(prefix, uuidstr string) (*PrefixUUID, error) {
-	u, err := uuid.ParseHex(uuidstr)
+func NewPrefixUUID(caboodle string) (*PrefixUUID, error) {
+	if len(caboodle) < 36 {
+		return nil, fmt.Errorf("types: could not read \"%s\" as a UUID", caboodle)
+	}
+	uuidPart := caboodle[len(caboodle)-36:]
+	u, err := uuid.ParseHex(uuidPart)
 	if err != nil {
 		return nil, err
 	}
+
 	return &PrefixUUID{
-		Prefix: prefix,
+		Prefix: caboodle[:len(caboodle)-36],
 		UUID:   u,
 	}, nil
 }
@@ -37,16 +42,11 @@ func (pu *PrefixUUID) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	if len(s) < 36 {
-		return fmt.Errorf("types: could not read \"%s\" as a UUID", s)
-	}
-	uuidPart := s[len(s)-36:]
-	u, err := uuid.ParseHex(uuidPart)
+	puPtr, err := NewPrefixUUID(s)
 	if err != nil {
 		return err
 	}
-	pu.Prefix = s[:len(s)-36]
-	pu.UUID = u
+	*pu = *puPtr
 	return nil
 }
 
