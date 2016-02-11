@@ -18,6 +18,19 @@ func (u *PrefixUUID) String() string {
 	return u.Prefix + u.UUID.String()
 }
 
+// NewPrefixUUID creates a PrefixUUID from the prefix and string uuid. Returns
+// an error if uuidstr cannot be parsed as a valid UUID
+func NewPrefixUUID(prefix, uuidstr string) (*PrefixUUID, error) {
+	u, err := uuid.ParseHex(uuidstr)
+	if err != nil {
+		return nil, err
+	}
+	return &PrefixUUID{
+		Prefix: prefix,
+		UUID:   u,
+	}, nil
+}
+
 func (pu *PrefixUUID) UnmarshalJSON(b []byte) error {
 	var s string
 	err := json.Unmarshal(b, &s)

@@ -19,6 +19,14 @@ func TestUUIDString(t *testing.T) {
 	test.AssertEquals(t, pfx.String(), fmt.Sprintf("job_%s", u))
 }
 
+func TestNewUUIDPrefix(t *testing.T) {
+	u, _ := uuid.NewV4()
+	pfx, err := NewPrefixUUID("job_", u.String())
+	test.AssertNotError(t, err, "")
+	test.AssertEquals(t, pfx.Prefix, "job_")
+	test.AssertEquals(t, pfx.UUID.String(), u.String())
+}
+
 var unmarshalTests = []struct {
 	in         string
 	prefix     string
