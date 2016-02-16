@@ -8,3 +8,6 @@ build:
 
 test:
 	go test ./...
+
+release:
+	bump_version minor types.go
