@@ -10,8 +10,8 @@ import (
 )
 
 type PrefixUUID struct {
-	UUID   *uuid.UUID
 	Prefix string
+	UUID   *uuid.UUID
 }
 
 func (u *PrefixUUID) String() string {
