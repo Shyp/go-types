@@ -18,8 +18,21 @@ func (u *PrefixUUID) String() string {
 	return u.Prefix + u.UUID.String()
 }
 
+// GenerateUUID generates a UUID with the given prefix.
+func GenerateUUID(prefix string) (PrefixUUID, error) {
+	uid, err := uuid.NewV4()
+	if err != nil {
+		return PrefixUUID{}, err
+	}
+	id := PrefixUUID{
+		Prefix: prefix,
+		UUID:   uid,
+	}
+	return id, nil
+}
+
 // NewPrefixUUID creates a PrefixUUID from the prefix and string uuid. Returns
-// an error if uuidstr cannot be parsed as a valid UUID
+// an error if uuidstr cannot be parsed as a valid UUID.
 func NewPrefixUUID(caboodle string) (PrefixUUID, error) {
 	if len(caboodle) < 36 {
 		return PrefixUUID{}, fmt.Errorf("types: Could not parse \"%s\" as a UUID with a prefix", caboodle)

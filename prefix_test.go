@@ -26,6 +26,13 @@ func TestNewUUIDPrefix(t *testing.T) {
 	test.AssertEquals(t, pfx.UUID.String(), "6740b44e-13b9-475d-af06-979627e0e0d6")
 }
 
+func TestGenerateUUID(t *testing.T) {
+	id, err := GenerateUUID("job_")
+	test.AssertNotError(t, err, "")
+	test.AssertEquals(t, id.Prefix, "job_")
+	test.Assert(t, len(id.String()) > 20, "")
+}
+
 var unmarshalTests = []struct {
 	in         string
 	prefix     string
