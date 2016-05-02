@@ -6,14 +6,14 @@ import (
 	"encoding/json"
 )
 
-const VERSION = "0.11"
+const VERSION = "0.12"
 
 // A NullString is a String that may be null. It can be encoded or decoded from
 // JSON or the database.
 type NullString struct {
 	sql.NullString
-	Valid  bool
-	String string
+	Valid	bool
+	String	string
 }
 
 func (ns *NullString) UnmarshalJSON(b []byte) error {
