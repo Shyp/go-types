@@ -4,26 +4,24 @@ import (
 	"encoding/json"
 	"testing"
 	"time"
-
-	"github.com/letsencrypt/boulder/test"
 )
 
 func TestTime(t *testing.T) {
 	var nt NullTime
 	str := []byte("\"2015-08-03T22:43:19.000Z\"")
 	err := json.Unmarshal(str, &nt)
-	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, nt.Valid, true)
-	test.AssertEquals(t, nt.Time.Year(), 2015)
-	test.AssertEquals(t, nt.Time.Second(), 19)
+	assertNotError(t, err, "")
+	assertEquals(t, nt.Valid, true)
+	assertEquals(t, nt.Time.Year(), 2015)
+	assertEquals(t, nt.Time.Second(), 19)
 }
 
 func TestNullTime(t *testing.T) {
 	var nt NullTime
 	str := []byte("null")
 	err := json.Unmarshal(str, &nt)
-	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, nt.Valid, false)
+	assertNotError(t, err, "")
+	assertEquals(t, nt.Valid, false)
 }
 
 func TestNullTimeMarshal(t *testing.T) {
@@ -33,8 +31,8 @@ func TestNullTimeMarshal(t *testing.T) {
 		Time:  tim,
 	}
 	bits, err := json.Marshal(nt)
-	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, string(bits), "\"2016-01-01T00:00:00Z\"")
+	assertNotError(t, err, "")
+	assertEquals(t, string(bits), "\"2016-01-01T00:00:00Z\"")
 }
 
 func TestNullTimeNullMarshal(t *testing.T) {
@@ -43,6 +41,6 @@ func TestNullTimeNullMarshal(t *testing.T) {
 		Time:  time.Time{},
 	}
 	bits, err := json.Marshal(nt)
-	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, string(bits), "null")
+	assertNotError(t, err, "")
+	assertEquals(t, string(bits), "null")
 }

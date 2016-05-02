@@ -3,25 +3,23 @@ package types
 import (
 	"encoding/json"
 	"testing"
-
-	"github.com/Shyp/goshyp/Godeps/_workspace/src/github.com/letsencrypt/boulder/test"
 )
 
 func TestString(t *testing.T) {
 	var ns NullString
 	str := []byte("\"foo\"")
 	err := json.Unmarshal(str, &ns)
-	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, ns.Valid, true)
-	test.AssertEquals(t, ns.String, "foo")
+	assertNotError(t, err, "")
+	assertEquals(t, ns.Valid, true)
+	assertEquals(t, ns.String, "foo")
 }
 
 func TestNullString(t *testing.T) {
 	var ns NullString
 	str := []byte("null")
 	err := json.Unmarshal(str, &ns)
-	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, ns.Valid, false)
+	assertNotError(t, err, "")
+	assertEquals(t, ns.Valid, false)
 }
 
 func TestStringMarshal(t *testing.T) {
@@ -30,8 +28,8 @@ func TestStringMarshal(t *testing.T) {
 		String: "foo bar",
 	}
 	b, err := json.Marshal(ns)
-	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, string(b), "\"foo bar\"")
+	assertNotError(t, err, "")
+	assertEquals(t, string(b), "\"foo bar\"")
 }
 
 func TestStringMarshalNull(t *testing.T) {
@@ -40,6 +38,6 @@ func TestStringMarshalNull(t *testing.T) {
 		String: "",
 	}
 	b, err := json.Marshal(ns)
-	test.AssertNotError(t, err, "")
-	test.AssertEquals(t, string(b), "null")
+	assertNotError(t, err, "")
+	assertEquals(t, string(b), "null")
 }
