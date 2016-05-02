@@ -8,6 +8,7 @@
 // See Q5 and Q11 here: https://www.mozilla.org/en-US/MPL/2.0/FAQ/ I think if
 // we want to modify this file we have to release it publicly, otherwise we're
 // fine.
+
 package types
 
 import (

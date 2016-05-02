@@ -9,6 +9,8 @@ import (
 	"github.com/nu7hatch/gouuid"
 )
 
+// A PrefixUUID solves this problem, by embedding an additional prefix as part
+// of the struct.
 type PrefixUUID struct {
 	Prefix string
 	UUID   *uuid.UUID

@@ -2,8 +2,15 @@ package types
 
 import (
 	"encoding/json"
+	"os"
 	"testing"
 )
+
+func ExampleNullString() {
+	n := NullString{Valid: true, String: "foo"}
+	json.NewEncoder(os.Stdout).Encode(n)
+	// Output: "foo"
+}
 
 func TestString(t *testing.T) {
 	var ns NullString

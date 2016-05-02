@@ -12,8 +12,8 @@ const VERSION = "0.11"
 // JSON or the database.
 type NullString struct {
 	sql.NullString
-	Valid	bool
-	String	string
+	Valid  bool
+	String string
 }
 
 func (ns *NullString) UnmarshalJSON(b []byte) error {

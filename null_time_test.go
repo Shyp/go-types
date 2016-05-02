@@ -2,9 +2,17 @@ package types
 
 import (
 	"encoding/json"
+	"os"
 	"testing"
 	"time"
 )
+
+func ExampleNullTime() {
+	t, _ := time.Parse(time.RFC3339, "2016-05-02T09:03:04-07:00")
+	nt := NullTime{Valid: true, Time: t}
+	json.NewEncoder(os.Stdout).Encode(nt)
+	// Output: "2016-05-02T09:03:04-07:00"
+}
 
 func TestTime(t *testing.T) {
 	var nt NullTime
