@@ -9,6 +9,16 @@ import (
 	"github.com/nu7hatch/gouuid"
 )
 
+func ExamplePrefixUUID() {
+	p, _ := NewPrefixUUID("usr_6740b44e-13b9-475d-af06-979627e0e0d6")
+	fmt.Println(p.Prefix)
+	fmt.Println(p.UUID.String())
+	fmt.Println(p.String())
+	// Output: usr_
+	// 6740b44e-13b9-475d-af06-979627e0e0d6
+	// usr_6740b44e-13b9-475d-af06-979627e0e0d6
+}
+
 func TestUUIDString(t *testing.T) {
 	u, _ := uuid.NewV4()
 	pfx := PrefixUUID{
