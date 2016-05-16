@@ -15,7 +15,7 @@ type PrefixUUID struct {
 	UUID   *uuid.UUID
 }
 
-func (u *PrefixUUID) String() string {
+func (u PrefixUUID) String() string {
 	return u.Prefix + u.UUID.String()
 }
 
