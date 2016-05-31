@@ -87,3 +87,24 @@ func TestUUIDMarshal(t *testing.T) {
 	_, err = json.Marshal(pfx)
 	assertEquals(t, err.Error(), "json: error calling MarshalJSON for type *types.PrefixUUID: no UUID to convert to JSON")
 }
+
+func TestScan(t *testing.T) {
+	var pu PrefixUUID
+	err := pu.Scan([]byte("pik_6740b44e-13b9-475d-af06-979627e0e0d6"))
+	assertNotError(t, err, "scanning byte array")
+	assertEquals(t, pu.Prefix, "pik_")
+	assertEquals(t, pu.UUID.String(), "6740b44e-13b9-475d-af06-979627e0e0d6")
+
+	err = pu.Scan([]byte("6740b44e-13b9-475d-af06-979627e0e0d6"))
+	assertNotError(t, err, "scanning byte array")
+	assertEquals(t, pu.Prefix, "")
+
+	err = pu.Scan([]byte{0x67, 0x40, 0xb4, 0x4e, 0x13, 0xb9, 0x47, 0x5d, 0xaf, 0x6, 0x97, 0x96, 0x27, 0xe0, 0xe0, 0xd6})
+	assertNotError(t, err, "scanning byte array")
+	assertEquals(t, pu.Prefix, "")
+	assertEquals(t, pu.UUID.String(), "6740b44e-13b9-475d-af06-979627e0e0d6")
+
+	err = pu.Scan(7)
+	assertError(t, err, "scanning a number")
+	assertEquals(t, err.Error(), "types: can't scan value 7 into a PrefixUUID")
+}
