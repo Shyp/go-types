@@ -16,7 +16,7 @@ test: vet
 race-test:
 	go test -race -v ./...
 
-release:
+release: test
 	go get github.com/Shyp/bump_version
 	bump_version minor types.go
 
