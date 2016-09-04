@@ -87,6 +87,11 @@ func TestScan(t *testing.T) {
 	assertEquals(t, pu.Prefix, "pik_")
 	assertEquals(t, pu.UUID.String(), "6740b44e-13b9-475d-af06-979627e0e0d6")
 
+	err = pu.Scan("pik_6740b44e-13b9-475d-af06-979627e0e0d6")
+	assertNotError(t, err, "scanning string")
+	assertEquals(t, pu.Prefix, "pik_")
+	assertEquals(t, pu.UUID.String(), "6740b44e-13b9-475d-af06-979627e0e0d6")
+
 	err = pu.Scan([]byte("6740b44e-13b9-475d-af06-979627e0e0d6"))
 	assertNotError(t, err, "scanning byte array")
 	assertEquals(t, pu.Prefix, "")
@@ -98,5 +103,5 @@ func TestScan(t *testing.T) {
 
 	err = pu.Scan(7)
 	assertError(t, err, "scanning a number")
-	assertEquals(t, err.Error(), "types: can't scan value 7 into a PrefixUUID")
+	assertEquals(t, err.Error(), "types: can't scan value of unknown type 7 into a PrefixUUID")
 }

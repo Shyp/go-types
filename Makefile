@@ -7,10 +7,10 @@ install:
 build:
 	go build ./...
 
-lint:
+vet:
 	go vet ./...
 
-test:
+test: vet
 	go test ./...
 
 race-test:
@@ -22,5 +22,5 @@ release:
 
 docs:
 	go get golang.org/x/tools/cmd/godoc
-	(sleep 1; open http://localhost:6060/pkg/github.com/Shyp/go-types) &
+	(sleep 1; open http://localhost:6060/pkg/github.com/kevinburke/go-types) &
 	godoc -http=:6060
