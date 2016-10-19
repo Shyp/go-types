@@ -1,7 +1,6 @@
 package types
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
 )
@@ -9,11 +8,20 @@ import (
 const VERSION = "0.14"
 
 // A NullString is a String that may be null. It can be encoded or decoded from
-// JSON or the database.
+// JSON, or the database. Here's how to use it as a scan destination:
+//
+//  var s NullString
+//  err := db.QueryRow("SELECT name FROM foo WHERE id=?", id).Scan(&s)
+//  ...
+//  if s.Valid {
+//     // use s.String
+//  } else {
+//     // NULL value
+//  }
+//
 type NullString struct {
-	sql.NullString
-	Valid	bool
-	String	string
+	Valid  bool
+	String string
 }
 
 func (ns *NullString) UnmarshalJSON(b []byte) error {
