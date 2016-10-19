@@ -1,4 +1,6 @@
 .PHONY: install build test
+BUMP_VERSION := $(shell command -v bump_version)
+GODOCDOC := $(shell command -v godocdoc)
 
 install:
 	go get ./...
@@ -16,11 +18,14 @@ test:
 race-test:
 	go test -race -v ./...
 
-release:
+release: race-test
+ifndef BUMP_VERSION
 	go get github.com/Shyp/bump_version
+endif
 	bump_version minor types.go
 
 docs:
-	go get golang.org/x/tools/cmd/godoc
-	(sleep 1; open http://localhost:6060/pkg/github.com/Shyp/go-types) &
-	godoc -http=:6060
+ifndef GODOCDOC
+	go get -u github.com/kevinburke/godocdoc
+endif
+	godocdoc
