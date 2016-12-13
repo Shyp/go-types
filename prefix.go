@@ -73,27 +73,27 @@ func (pu PrefixUUID) MarshalJSON() ([]byte, error) {
 
 // Scan implements the Scanner interface. Note only the UUID gets scanned/set
 // here, we can't determine the prefix from the database. `value` should be
-// a [16]byte
+// a [16]byte or a string.
 func (pu *PrefixUUID) Scan(value interface{}) error {
 	if value == nil {
 		return errors.New("types: cannot scan null into a PrefixUUID")
 	}
-	bits, ok := value.([]byte)
-	if !ok {
-		return fmt.Errorf("types: can't scan value %v into a PrefixUUID", value)
-	}
 	var err error
-	if len(bits) >= 36 {
-		*pu, err = NewPrefixUUID(string(bits))
-	} else {
-		var u *uuid.UUID
-		u, err = uuid.Parse(bits)
-		pu.UUID = u
+	switch t := value.(type) {
+	case []byte:
+		if len(t) >= 36 {
+			*pu, err = NewPrefixUUID(string(t))
+		} else {
+			var u *uuid.UUID
+			u, err = uuid.Parse(t)
+			pu.UUID = u
+		}
+	case string:
+		*pu, err = NewPrefixUUID(t)
+	default:
+		return fmt.Errorf("types: can't scan value of unknown type %v into a PrefixUUID", value)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Value implements the driver.Valuer interface.
