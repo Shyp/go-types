@@ -32,7 +32,7 @@ func (ns *NullString) UnmarshalJSON(b []byte) error {
 }
 
 func (ns NullString) MarshalJSON() ([]byte, error) {
-	if ns.Valid == false {
+	if !ns.Valid {
 		return []byte("null"), nil
 	}
 	s, err := json.Marshal(ns.String)
