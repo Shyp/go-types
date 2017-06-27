@@ -216,6 +216,9 @@ func (b Bits) Gigabytes() float64 {
 // positive number before the decimal. At most three decimal places of precision
 // are printed.
 func (b Bits) String() string {
+	if b == 0 {
+		return "0"
+	}
 	// Largest value is "-123.150EB"
 	var buf [10]byte
 	w := len(buf) - 1
@@ -234,31 +237,31 @@ func (b Bits) String() string {
 		w -= len(val)
 		copy(buf[w:], val)
 	} else {
-		u = u / 8
 		switch {
 		case u < uint64(Megabyte):
 			w -= 1
 			copy(buf[w:], "kB")
+			u /= 8
 		case u < uint64(Gigabyte):
 			w -= 1
 			copy(buf[w:], "MB")
-			u /= 1000
+			u /= 8 * 1e3
 		case u < uint64(Terabyte):
 			w -= 1
 			copy(buf[w:], "GB")
-			u /= 1000
+			u /= 8 * 1e6
 		case u < uint64(Petabyte):
 			w -= 1
 			copy(buf[w:], "TB")
-			u /= 1000
+			u /= 8 * 1e9
 		case u < uint64(Exabyte):
 			w -= 1
 			copy(buf[w:], "PB")
-			u /= 1000
+			u /= 8 * 1e12
 		case u >= uint64(Exabyte):
 			w -= 1
 			copy(buf[w:], "EB")
-			u /= 1000
+			u /= 8 * 1e15
 		}
 		w, u = fmtFrac(buf[:w], u, 3)
 		w = fmtInt(buf[:w], u)

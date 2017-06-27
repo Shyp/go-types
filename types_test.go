@@ -102,13 +102,21 @@ func TestKilobytes(t *testing.T) {
 }
 
 func TestBitsString(t *testing.T) {
-	b := 7 * Bit
+	b := 0 * Bit
+	if got := b.String(); got != "0" {
+		t.Errorf("0 bits should be 0, got %q", got)
+	}
+	b = 7 * Bit
 	if got := b.String(); got != "7bit" {
 		t.Errorf("7 bits should be 7bit, got %q", got)
 	}
 	b = 9 * Bit
 	if got := b.String(); got != "1.125B" {
 		t.Errorf("9 bits should be 1.125B, got %q", got)
+	}
+	b = 7380*Kilobyte + 871*Byte
+	if got := b.String(); got != "7.38MB" {
+		t.Errorf("25015kB should be 25.015MB, got %q", got)
 	}
 	b = 25015 * Kilobyte
 	if got := b.String(); got != "25.015MB" {
@@ -121,5 +129,9 @@ func TestBitsString(t *testing.T) {
 	b = -123*Megabyte - 15*Kilobyte
 	if got := b.String(); got != "-123.015MB" {
 		t.Errorf("should be -123.015MB, got %q", got)
+	}
+	b = 1*Exabyte + 15*Petabyte
+	if got := b.String(); got != "1.015EB" {
+		t.Errorf("should be 1.015EB, got %q", got)
 	}
 }
