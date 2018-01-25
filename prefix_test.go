@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/satori/go.uuid"
+	"github.com/kevinburke/go.uuid"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -21,10 +21,7 @@ func ExamplePrefixUUID() {
 }
 
 func TestUUIDString(t *testing.T) {
-	u, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
+	u := uuid.NewV4()
 	pfx := PrefixUUID{
 		Prefix: "job_",
 		UUID:   u,

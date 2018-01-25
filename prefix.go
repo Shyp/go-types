@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/satori/go.uuid"
+	"github.com/kevinburke/go.uuid"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -23,15 +23,10 @@ func (u PrefixUUID) String() string {
 
 // GenerateUUID generates a UUID with the given prefix.
 func GenerateUUID(prefix string) PrefixUUID {
-	uid, err := uuid.NewV4()
-	if err != nil {
-		panic(err) // out of randomness, whatever.
-	}
-	id := PrefixUUID{
+	return PrefixUUID{
 		Prefix: prefix,
-		UUID:   uid,
+		UUID:   uuid.NewV4(),
 	}
-	return id
 }
 
 // NewPrefixUUID creates a PrefixUUID from the prefix and string uuid. Returns
