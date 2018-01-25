@@ -2,17 +2,19 @@ package types
 
 import (
 	"database/sql/driver"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 
-	"github.com/nu7hatch/gouuid"
+	"github.com/satori/go.uuid"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // A PrefixUUID stores an additional prefix as part of a UUID type.
 type PrefixUUID struct {
 	Prefix string
-	UUID   *uuid.UUID
+	UUID   uuid.UUID
 }
 
 func (u PrefixUUID) String() string {
@@ -20,16 +22,16 @@ func (u PrefixUUID) String() string {
 }
 
 // GenerateUUID generates a UUID with the given prefix.
-func GenerateUUID(prefix string) (PrefixUUID, error) {
+func GenerateUUID(prefix string) PrefixUUID {
 	uid, err := uuid.NewV4()
 	if err != nil {
-		return PrefixUUID{}, err
+		panic(err) // out of randomness, whatever.
 	}
 	id := PrefixUUID{
 		Prefix: prefix,
 		UUID:   uid,
 	}
-	return id, nil
+	return id
 }
 
 // NewPrefixUUID creates a PrefixUUID from the prefix and string uuid. Returns
@@ -39,7 +41,7 @@ func NewPrefixUUID(caboodle string) (PrefixUUID, error) {
 		return PrefixUUID{}, fmt.Errorf("types: Could not parse \"%s\" as a UUID with a prefix", caboodle)
 	}
 	uuidPart := caboodle[len(caboodle)-36:]
-	u, err := uuid.ParseHex(uuidPart)
+	u, err := uuid.FromString(uuidPart)
 	if err != nil {
 		return PrefixUUID{}, err
 	}
@@ -65,9 +67,6 @@ func (pu *PrefixUUID) UnmarshalJSON(b []byte) error {
 }
 
 func (pu PrefixUUID) MarshalJSON() ([]byte, error) {
-	if pu.UUID == nil {
-		return []byte{}, errors.New("no UUID to convert to JSON")
-	}
 	return json.Marshal(pu.String())
 }
 
@@ -81,11 +80,11 @@ func (pu *PrefixUUID) Scan(value interface{}) error {
 	var err error
 	switch t := value.(type) {
 	case []byte:
-		if len(t) >= 36 {
+		if len(t) >= 32 {
 			*pu, err = NewPrefixUUID(string(t))
 		} else {
-			var u *uuid.UUID
-			u, err = uuid.Parse(t)
+			var u uuid.UUID
+			u, err = uuid.FromBytes(t)
 			pu.UUID = u
 		}
 	case string:
@@ -103,4 +102,32 @@ func (pu PrefixUUID) Value() (driver.Value, error) {
 	// binary_parameters=yes on the connection string. Instead of that, just
 	// pass a string to the database, which is easy to handle.
 	return pu.UUID.String(), nil
+}
+
+// GetBSON implements the mgo.Getter interface.
+func (pu PrefixUUID) GetBSON() (interface{}, error) {
+	return bson.Binary{
+		Kind: 0x03,
+		Data: pu.UUID[:],
+	}, nil
+}
+
+// SetBSON implements the mgo.Setter interface.
+func (pu *PrefixUUID) SetBSON(raw bson.Raw) error {
+	// first 4 bytes are int32 LE length
+	if len(raw.Data) < 4 {
+		return fmt.Errorf("invalid BSON data: too short")
+	}
+	l := binary.LittleEndian.Uint32(raw.Data[:4])
+	var err error
+	if l >= 32 {
+		// null terminated, so subtract 1
+		d := string(raw.Data[4 : len(raw.Data)-1])
+		*pu, err = NewPrefixUUID(d)
+	} else {
+		var u uuid.UUID
+		u, err = uuid.FromBytes(raw.Data[4:])
+		pu.UUID = u
+	}
+	return err
 }

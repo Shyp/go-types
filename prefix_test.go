@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/nu7hatch/gouuid"
+	"github.com/satori/go.uuid"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func ExamplePrefixUUID() {
@@ -20,7 +21,10 @@ func ExamplePrefixUUID() {
 }
 
 func TestUUIDString(t *testing.T) {
-	u, _ := uuid.NewV4()
+	u, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
 	pfx := PrefixUUID{
 		Prefix: "job_",
 		UUID:   u,
@@ -28,16 +32,20 @@ func TestUUIDString(t *testing.T) {
 	assertEquals(t, pfx.String(), fmt.Sprintf("job_%s", u))
 }
 
-func TestNewUUIDPrefix(t *testing.T) {
+func TestNewPrefixUUID(t *testing.T) {
 	pfx, err := NewPrefixUUID("usr_6740b44e-13b9-475d-af06-979627e0e0d6")
 	assertNotError(t, err, "")
 	assertEquals(t, pfx.Prefix, "usr_")
 	assertEquals(t, pfx.UUID.String(), "6740b44e-13b9-475d-af06-979627e0e0d6")
+
+	pfx, err = NewPrefixUUID("6740b44e-13b9-475d-af06-979627e0e0d6")
+	assertNotError(t, err, "")
+	assertEquals(t, pfx.Prefix, "")
+	assertEquals(t, pfx.UUID.String(), "6740b44e-13b9-475d-af06-979627e0e0d6")
 }
 
 func TestGenerateUUID(t *testing.T) {
-	id, err := GenerateUUID("job_")
-	assertNotError(t, err, "")
+	id := GenerateUUID("job_")
 	assertEquals(t, id.Prefix, "job_")
 	assert(t, len(id.String()) > 20, "")
 }
@@ -52,13 +60,14 @@ var unmarshalTests = []struct {
 	{"6740b44e-13b9-475d-af06-979627e0e0d6", "", "6740b44e-13b9-475d-af06-979627e0e0d6", nil},
 	{"", "", "", errors.New("types: Could not parse \"\" as a UUID with a prefix")},
 	{"foo", "", "", errors.New("types: Could not parse \"foo\" as a UUID with a prefix")},
-	{"6740b44e-13b9-475d-af069-79627e0e0d6", "", "", errors.New("Invalid UUID string")},
+	// Has one extra char.
+	{"6740b44e-13b9-475d-af069-79627e0e0d6", "", "", errors.New("uuid: incorrect UUID format 6740b44e-13b9-475d-af069-79627e0e0d6")},
 }
 
 func TestUUIDUnmarshal(t *testing.T) {
 	for _, tt := range unmarshalTests {
 		var pfxu PrefixUUID
-		err := json.Unmarshal([]byte(fmt.Sprintf("\"%s\"", tt.in)), &pfxu)
+		err := json.Unmarshal([]byte(fmt.Sprintf(`"%s"`, tt.in)), &pfxu)
 		if tt.err != nil {
 			assertError(t, err, "")
 			assertEquals(t, err.Error(), tt.err.Error())
@@ -71,7 +80,7 @@ func TestUUIDUnmarshal(t *testing.T) {
 }
 
 func TestUUIDMarshal(t *testing.T) {
-	u, _ := uuid.ParseHex("6740b44e-13b9-475d-af06-979627e0e0d6")
+	u, _ := uuid.FromString("6740b44e-13b9-475d-af06-979627e0e0d6")
 	pfx := &PrefixUUID{
 		Prefix: "usr_",
 		UUID:   u,
@@ -79,13 +88,6 @@ func TestUUIDMarshal(t *testing.T) {
 	b, err := json.Marshal(pfx)
 	assertNotError(t, err, "")
 	assertEquals(t, string(b), "\"usr_6740b44e-13b9-475d-af06-979627e0e0d6\"")
-
-	pfx = &PrefixUUID{
-		Prefix: "usr_",
-		UUID:   nil,
-	}
-	_, err = json.Marshal(pfx)
-	assertEquals(t, err.Error(), "json: error calling MarshalJSON for type *types.PrefixUUID: no UUID to convert to JSON")
 }
 
 func TestScan(t *testing.T) {
@@ -112,4 +114,11 @@ func TestScan(t *testing.T) {
 	err = pu.Scan(7)
 	assertError(t, err, "scanning a number")
 	assertEquals(t, err.Error(), "types: can't scan value of unknown type 7 into a PrefixUUID")
+}
+
+func TestSetBSON(t *testing.T) {
+	var pu PrefixUUID
+	err := pu.SetBSON(bson.Raw{Data: []byte{0x25, 0x0, 0x0, 0x0, 0x31, 0x36, 0x38, 0x65, 0x37, 0x31, 0x36, 0x61, 0x2d, 0x37, 0x39, 0x34, 0x61, 0x2d, 0x31, 0x31, 0x65, 0x37, 0x2d, 0x39, 0x35, 0x30, 0x62, 0x2d, 0x34, 0x63, 0x33, 0x32, 0x37, 0x35, 0x39, 0x32, 0x34, 0x32, 0x61, 0x35, 0x0}})
+	assertNotError(t, err, "setting BSON")
+	assertEquals(t, pu.String(), "168e716a-794a-11e7-950b-4c32759242a5")
 }
