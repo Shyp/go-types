@@ -17,6 +17,9 @@ type PrefixUUID struct {
 	UUID   uuid.UUID
 }
 
+// NilUUID is the empty PrefixUUID.
+var NilUUID = PrefixUUID{UUID: uuid.Nil}
+
 func (u PrefixUUID) String() string {
 	return u.Prefix + u.UUID.String()
 }
